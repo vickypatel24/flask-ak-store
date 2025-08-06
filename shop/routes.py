@@ -1,7 +1,3 @@
-#
-# FILE: shop/routes.py
-#
-
 from flask import render_template, url_for, flash, redirect, request, Blueprint
 from flask_login import login_user, current_user, logout_user, login_required
 from shop import db
@@ -13,9 +9,29 @@ bp = Blueprint('routes', __name__)
 
 @bp.route('/')
 @bp.route('/home')
-def home():
-    products = Product.query.all()
-    return render_template('home.html', title='Home', products=products)
+def index():
+    # products = Product.query.all()
+    # return render_template('home.html', title='Home', products=products)
+    return render_template('index.html', title='Home')
+
+@bp.route('/about')
+def about():
+    return render_template('about.html', title='About Us')
+
+@bp.route('/products')
+def products():
+    # Later we will fetch products from the database here
+    # For now, just show the page
+    all_products = Product.query.all()
+    return render_template('products.html', title='Our Products', products=all_products)
+
+@bp.route('/contact')
+def contact():
+    return render_template('contact.html', title='Contact Us')
+
+@bp.route('/faq')
+def faq():
+    return render_template('faq.html', title='FAQs')
 
 @bp.route('/register', methods=['GET', 'POST'])
 def register():

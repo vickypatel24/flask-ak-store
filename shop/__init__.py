@@ -12,6 +12,7 @@ def create_app():
 
     # --- Application Configuration ---
     app.config['SECRET_KEY'] = 'b1dbc1e24f15c5d1c91b0cab29f8af542a0973d597edd3f1f46dafda1840faec'
+    
     ### local development database
     # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:admin@localhost/flask_shop_db'
 
