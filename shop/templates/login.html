@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div>
+        <h1>Log In</h1>
+        <form method="POST" action="">
+            {{ form.hidden_tag() }} <!-- CSRF Token -->
+            
+            <p>
+                {{ form.email.label }}<br>
+                {{ form.email(size=32) }}<br>
+                {% for error in form.email.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form.password.label }}<br>
+                {{ form.password(size=32) }}<br>
+                {% for error in form.password.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form.remember() }}
+                {{ form.remember.label }}
+            </p>
+            <p>{{ form.submit() }}</p>
+        </form>
+    </div>
+    <hr>
+    <p>
+        Need an account? <a href="{{ url_for('routes.register') }}">Sign Up Now</a>
+    </p>
+{% endblock content %}
