@@ -1,6 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+import os
+
 
 # Initialize extensions so they can be used by other modules
 db = SQLAlchemy()
@@ -11,13 +13,24 @@ def create_app():
     app = Flask(__name__)
 
     # --- Application Configuration ---
-    app.config['SECRET_KEY'] = 'b1dbc1e24f15c5d1c91b0cab29f8af542a0973d597edd3f1f46dafda1840faec'
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'a-hard-to-guess-default-secret-key-for-dev')
+
     
     ### local development database
     # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:admin@localhost/flask_shop_db'
 
     # --- Production database configuration ---
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:admin@localhost/flask_shop_db'
+
+    db_user = os.environ.get('DB_USER')
+    db_pass = os.environ.get('DB_PASS')
+    db_host = os.environ.get('DB_HOST')
+    db_name = os.environ.get('DB_NAME')
+
+    if all([db_user, db_pass, db_host, db_name]):
+        app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{db_user}:{db_pass}@{db_host}/{db_name}'
+    else:
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:admin@localhost/flask_shop_db'
+
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     # Initialize extensions with the app instance
