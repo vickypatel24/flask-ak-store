@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Reset Password{% endblock %}
+
+{% block content %}
+<main>
+    <section class="sign-in-form section-padding">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto col-12">
+                    <h1 class="hero-title text-center mb-5">Reset Password</h1>
+                    <div class="row">
+                        <div class="col-lg-8 col-11 mx-auto">
+                            <form method="POST" action="">
+                                {{ form.hidden_tag() }}
+                                <div class="form-floating mb-4">
+                                    {{ form.email(class="form-control", placeholder=form.email.label.text) }}
+                                    {{ form.email.label() }}
+                                    {% if form.email.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.email.errors %}<span>{{ error }}</span>{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                {{ form.submit(class="btn custom-btn form-control mt-4 mb-3") }}
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

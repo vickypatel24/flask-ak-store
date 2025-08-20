@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Verify Account{% endblock %}
+
+{% block content %}
+<main>
+    <section class="sign-in-form section-padding">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto col-12">
+                    <h1 class="hero-title text-center mb-3">Check Your Email</h1>
+                    <p class="text-center mb-5">We've sent a 6-digit verification code to your email address.</p>
+
+                    <div class="row">
+                        <div class="col-lg-8 col-11 mx-auto">
+                            <!-- This is where flashed messages like 'Invalid OTP' will appear -->
+                            {% with messages = get_flashed_messages(with_categories=true) %}
+                                {% if messages %}
+                                    {% for category, message in messages %}
+                                        <div class="alert alert-{{ category }}">
+                                            {{ message }}
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endwith %}
+
+                            <form method="POST" action="">
+                                {{ form.hidden_tag() }}
+                                <div class="form-floating mb-4">
+                                    {{ form.otp(class="form-control", placeholder=form.otp.label.text) }}
+                                    {{ form.otp.label() }}
+                                    {% if form.otp.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.otp.errors %}<span>{{ error }}</span>{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                {{ form.submit(class="btn custom-btn form-control mt-4 mb-3") }}
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

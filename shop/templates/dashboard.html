@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<main>
+    <section class="section-padding">
+        <div class="container">
+            <h1 class="hero-title text-center mb-5">Admin Dashboard</h1>
+
+            <!-- Section for Flashed Messages -->
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+
+            <!-- Row for the two main control panels -->
+            <div class="row justify-content-center mb-5">
+                <!-- Email Import Panel -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Import Emails</h5>
+                            <p class="card-text">Paste a list of emails to add to the mailing list.</p>
+                            <form method="POST" action="{{ url_for('routes.import_emails') }}">
+                                {{ import_form.hidden_tag() }}
+                                <div class="mb-3">
+                                    {{ import_form.emails(class="form-control") }}
+                                </div>
+                                {{ import_form.submit(class="btn btn-primary w-100") }}
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scheduler Control Panel -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">Scheduler Control</h5>
+                            <p>Manage the automated email sending schedule.</p>
+                            <div class="alert alert-info">
+                                <strong>Current Status:</strong> 
+                                <span class="badge bg-{% if job_status == 'Running' %}success{% else %}warning{% endif %}">{{ job_status }}</span>
+                                <br>
+                                <strong>Current Interval:</strong> Every {{ current_interval }} minutes.
+                            </div>
+
+                            <!-- Interval Update Form -->
+                            <form method="POST" action="{{ url_for('routes.update_interval') }}" class="mb-3">
+                                {{ interval_form.hidden_tag() }}
+                                <div class="input-group">
+                                    {{ interval_form.interval(class="form-control") }}
+                                    <span class="input-group-text">minutes</span>
+                                </div>
+                                {{ interval_form.submit(class="btn btn-success w-100 mt-2", value="Update & Resume") }}
+                            </form>
+
+                            <hr>
+
+                            <!-- Pause/Stop Button (pushed to the bottom) -->
+                            <div class="mt-auto">
+                                {% if job_status == 'Running' %}
+                                    <!-- If job is running, show the STOP button -->
+                                    <form method="POST" action="{{ url_for('routes.pause_scheduler') }}">
+                                        <button type="submit" class="btn btn-danger w-100">Stop Sending</button>
+                                    </form>
+                                {% else %}
+                                    <p class="text-center text-muted">Scheduler is paused. To resume, update the schedule above or import new emails.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table of Emails -->
+            <hr>
+            <h2 class="text-center my-4">Mailing List</h2>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Email Address</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Date Sent</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in mailing_list %}
+                        <tr>
+                            <th scope="row">{{ loop.index }}</th>
+                            <td>{{ entry.email }}</td>
+                            <td>
+                                <span class="badge bg-{% if entry.status == 'Sent' %}success{% elif entry.status == 'Pending' %}warning{% else %}secondary{% endif %}">
+                                    {{ entry.status }}
+                                </span>
+                            </td>
+                            <td>{{ entry.sent_date.strftime('%Y-%m-%d %H:%M') if entry.sent_date else 'N/A' }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center">No emails in the mailing list yet. Use the import form to add some.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </section>
+</main>
+{% endblock %}

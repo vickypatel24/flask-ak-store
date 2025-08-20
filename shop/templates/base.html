@@ -45,13 +45,6 @@
                         <strong><span>Genric</span> Store</strong>
                     </a>
 
-                    <div class="d-lg-none">
-                        <a href="{{ url_for('routes.login') }}" class="bi-person custom-icon me-3"></a>
-
-                        <a href="product-detail.html" class="bi-bag custom-icon"></a>
-                        <!-- {{ url_for('routes.login') }} -->
-                    </div>
-
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav mx-auto">
                             <li class="nav-item">
@@ -71,16 +64,34 @@
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('routes.contact') }}">Contac---t</a>
+                                <a class="nav-link" href="{{ url_for('routes.contact') }}">Contact</a>
                             </li>
+                            <!-- Dynamic dashboard link -->
+                            {% if current_user.is_authenticated and current_user.is_admin %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('routes.dashboard') }}">Dashboard</a>
+                            </li>
+                            {% endif %}
                         </ul>
 
-                        <div class="d-none d-lg-block">
-                            <a href="{{ url_for('routes.login') }}" class="bi-person custom-icon me-3"></a>
 
-                            <a href="product-detail.html" class="bi-bag custom-icon"></a>
-                            <!-- {{ url_for('routes.login') }} -->
-                        </div>
+                    </ul>
+
+                    <!-- START DYNAMIC BLOCK 2: For desktop view -->
+                    <div class="d-none d-lg-block">
+                        {% if current_user.is_authenticated %}
+                            <!-- If user is logged in, show their username and a logout link -->
+                            <span class="me-3">Hi, {{ current_user.username }}!</span>
+                            <a href="{{ url_for('routes.logout') }}" class="bi-box-arrow-right custom-icon me-3"></a>
+                        {% else %}
+                            <!-- If user is logged out, show login link -->
+                            <a href="{{ url_for('routes.login') }}" class="bi-person custom-icon me-3"></a>
+                        {% endif %}
+                        
+                        <a href="product-detail.html" class="bi-bag custom-icon"></a>
+                    </div>
+                    <!-- END DYNAMIC BLOCK 2 -->
+
                     </div>
                 </div>
             </nav>

@@ -1,0 +1,82 @@
+<!-- templates/email_template.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ subject }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+        }
+        .product-list {
+            list-style-type: decimal; /* Use numbers 1), 2), 3)... */
+            padding-left: 20px;
+        }
+        .product-list li {
+            margin-bottom: 10px;
+        }
+        .product-list a {
+            color: #0056b3; /* A professional blue link color */
+            text-decoration: none;
+        }
+        .product-list a:hover {
+            text-decoration: underline; /* Underline on hover for clarity */
+        }
+        .note {
+            font-size: 14px;
+            color: #555;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <p>{{ greeting }}</p>
+
+        <p>
+            I am from <strong>{{ company_name }}</strong> (<a href="{{ company_url }}">{{ company_url_display }}</a>).
+        </p>
+        
+        <p>How are you? We hope you are well. let me know if I do anything for you on the Global epidemic.</p>
+
+        <p>This is one of the best places to buy medication</p>
+        
+        <!-- ======================================================= -->
+        <!-- ==                 THE KEY CHANGE IS HERE              == -->
+        <!-- ======================================================= -->
+        
+        <ol class="product-list">
+            {% for product in products %}
+                <li>
+                    <a href="{{ product.url }}">{{ product.name }}</a>
+                </li>
+            {% endfor %}
+        </ol>
+
+        <!-- ======================================================= -->
+        <!-- ======================================================= -->
+        
+        <p class="note">
+            (All medication origin country: INDIA)
+        </p>
+
+        <p class="note">
+            <strong>NOTE:</strong> We are able to send medication worldwide.
+        </p>
+
+        <p>{{ closing_message }}</p>
+
+    </div>
+</body>
+</html>

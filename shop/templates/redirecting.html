@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Redirecting...</title>
+    <!-- This is the magic tag. It tells the browser to redirect to the target_url after 0 seconds. -->
+    <meta http-equiv="refresh" content="0; url={{ target_url }}">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f4f4f4; text-align: center; }
+        .container { padding: 20px; }
+        .spinner { border: 4px solid rgba(0,0,0,.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: #09f; animation: spin 1s ease infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="spinner"></div>
+        <h1>Please wait...</h1>
+        <p>You are being securely redirected.</p>
+        <p><small>If you are not redirected automatically, <a href="{{ target_url }}">click here</a>.</small></p>
+    </div>
+</body>
+</html>
