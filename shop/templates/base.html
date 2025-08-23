@@ -45,6 +45,13 @@
                         <strong><span>Genric</span> Store</strong>
                     </a>
 
+                    <div class="d-lg-none">
+                        <a href="{{ url_for('routes.login') }}" class="bi-person custom-icon me-3"></a>
+
+                        <a href="product-detail.html" class="bi-bag custom-icon"></a>
+                        <!-- {{ url_for('routes.login') }} -->
+                    </div>
+
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav mx-auto">
                             <li class="nav-item">
@@ -78,7 +85,7 @@
                     </ul>
 
                     <!-- START DYNAMIC BLOCK 2: For desktop view -->
-                    <div class="d-none d-lg-block">
+                        <div class="d-none d-lg-block">
                         {% if current_user.is_authenticated %}
                             <!-- If user is logged in, show their username and a logout link -->
                             <span class="me-3">Hi, {{ current_user.username }}!</span>
@@ -87,9 +94,9 @@
                             <!-- If user is logged out, show login link -->
                             <a href="{{ url_for('routes.login') }}" class="bi-person custom-icon me-3"></a>
                         {% endif %}
-                        
-                        <a href="product-detail.html" class="bi-bag custom-icon"></a>
-                    </div>
+
+                            <a href="product-detail.html" class="bi-bag custom-icon"></a>
+                        </div>
                     <!-- END DYNAMIC BLOCK 2 -->
 
                     </div>
@@ -107,8 +114,6 @@
                     <div class="col-lg-3 col-10 me-auto mb-4">
                         <h4 class="text-white mb-3"><a href="{{ url_for('routes.index') }}">Genric</a> Store</h4>
                         <p class="copyright-text text-muted mt-lg-5 mb-4 mb-lg-0">Copyright © 2022 <strong>Genric Store</strong></p>
-                        <br>
-                        <p class="copyright-text">Designed by <a href="https://www.tooplate.com/" target="_blank">Tooplate</a></p>
                     </div>
 
                     <div class="col-lg-5 col-8">

@@ -120,22 +120,23 @@ def logout():
     return redirect(url_for('routes.index'))
 
 
-@bp.route('/dashboard', methods=['GET', 'POST'])
+@bp.route('/dashboard', methods=['GET'])
 @login_required
 @admin_required
 def dashboard():
     import_form = EmailImportForm()
     interval_form = IntervalUpdateForm()
     
-    from .models import Settings # Import here to avoid circular dependency issues
-    current_setting = Settings.query.filter_by(key='email_interval').first()
+    # Get status and interval directly from the database
+    status_setting = Settings.query.filter_by(key='scheduler_status').first()
+    interval_setting = Settings.query.filter_by(key='email_interval').first()
     
-    if current_setting:
-        interval_form.interval.data = int(current_setting.value)
+    # Provide default values if they don't exist in the DB yet
+    job_status = status_setting.value if status_setting else "Paused"
+    current_interval = interval_setting.value if interval_setting else 10
 
-    # Get the scheduler job to check its status
-    scheduler_job = scheduler.get_job('email_sending_job')
-    job_status = "Paused" if scheduler_job.next_run_time is None else "Running"
+    # Pre-populate the form with the current interval
+    interval_form.interval.data = int(current_interval)
 
     mailing_list_entries = MailingList.query.order_by(MailingList.id).all()
     
@@ -145,7 +146,7 @@ def dashboard():
                            interval_form=interval_form,
                            mailing_list=mailing_list_entries,
                            job_status=job_status,
-                           current_interval=current_setting.value if current_setting else 10)
+                           current_interval=current_interval)
 
 
 @bp.route('/product/<int:product_id>')
@@ -326,15 +327,16 @@ def import_emails():
         # After successfully adding new emails, check if the scheduler is paused.
         # If it is, resume it so it can start sending to the new addresses.
         if new_emails_count > 0:
-            scheduler_job = scheduler.get_job('email_sending_job')
-            if scheduler_job and scheduler_job.next_run_time is None:
-                scheduler.resume_job('email_sending_job')
-                flash("New pending emails found. Resuming email scheduler.", "info")
-
+            status_setting = Settings.query.filter_by(key='scheduler_status').first()
+            if not status_setting:
+                status_setting = Settings(key='scheduler_status', value='Running')
+                db.session.add(status_setting)
+            else:
+                status_setting.value = 'Running'
+            db.session.commit()
+            flash("New emails imported. Scheduler will resume on its next run.", "info")
     else:
-        # If the form fails validation (e.g., the text box was empty), show an error.
-        flash("Form submission failed. Please ensure you have pasted content into the text box.", "danger")
-
+        flash("Form submission failed.", "danger")
     return redirect(url_for('routes.dashboard'))
 
 
@@ -343,45 +345,35 @@ def import_emails():
 @login_required
 @admin_required
 def pause_scheduler():
-    """Pauses the background job AND saves the state to the database."""
-    scheduler_job = scheduler.get_job('email_sending_job')
-    if scheduler_job and scheduler_job.next_run_time is not None:
-        scheduler.pause_job('email_sending_job')
-        
-        # --- SAVE STATE TO DB ---
-        status_setting = Settings.query.filter_by(key='scheduler_status').first()
-        if not status_setting:
-            status_setting = Settings(key='scheduler_status', value='Paused')
-            db.session.add(status_setting)
-        else:
-            status_setting.value = 'Paused'
-        db.session.commit()
-        
-        flash("Email scheduler has been paused.", "info")
+    """Pauses the scheduler by updating the flag in the database."""
+    status_setting = Settings.query.filter_by(key='scheduler_status').first()
+    if not status_setting:
+        status_setting = Settings(key='scheduler_status', value='Paused')
+        db.session.add(status_setting)
     else:
-        flash("Scheduler was not running.", "warning")
-        
+        status_setting.value = 'Paused'
+    db.session.commit()
+    flash("Email scheduler has been paused.", "info")
     return redirect(url_for('routes.dashboard'))
-
 
 @bp.route('/update-interval', methods=['POST'])
 @login_required
 @admin_required
 def update_interval():
+    """Updates interval and ensures scheduler is set to 'Running'."""
     form = IntervalUpdateForm()
     if form.validate_on_submit():
         new_interval = form.interval.data
         
-        # Update the interval setting
+        # Update interval setting
         interval_setting = Settings.query.filter_by(key='email_interval').first()
         if not interval_setting:
             interval_setting = Settings(key='email_interval', value=str(new_interval))
             db.session.add(interval_setting)
         else:
             interval_setting.value = str(new_interval)
-        
-        # --- SAVE STATE TO DB ---
-        # Update the status setting to 'Running'
+            
+        # Set status to 'Running'
         status_setting = Settings.query.filter_by(key='scheduler_status').first()
         if not status_setting:
             status_setting = Settings(key='scheduler_status', value='Running')
@@ -389,14 +381,9 @@ def update_interval():
         else:
             status_setting.value = 'Running'
         db.session.commit()
-        
-        # Reschedule and resume the job
-        scheduler.reschedule_job('email_sending_job', trigger='interval', minutes=new_interval)
-        scheduler.resume_job('email_sending_job')
 
-        flash(f"Email sending interval updated to {new_interval} minutes. Scheduler is now running.", "success")
+        flash(f"Interval updated to {new_interval} minutes. Scheduler will run on its next cycle.", "success")
     return redirect(url_for('routes.dashboard'))
-
 
 # ; Your Hosting SMTP (cPanel, etc.)
 # ; If your hosting provider gives you email accounts (like noreply@yourdomain.com),
