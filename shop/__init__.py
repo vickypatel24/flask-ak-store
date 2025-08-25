@@ -19,41 +19,41 @@ login_manager = LoginManager()
 migrate = Migrate()
 
 
-def _ensure_default_admins():
-    """Checks for and creates default admin users if they don't exist."""
-    from .models import User
+# def _ensure_default_admins():
+#     """Checks for and creates default admin users if they don't exist."""
+#     from .models import User
 
-    default_admins = [
-        {
-            'username': 'vitrag',
-            'email': 'vitragpatel2408@gmail.com',
-            'password': 'vklodulalit!'
-        },
-        {
-            'username': 'akshay',
-            'email': 'vitragharkhani1606@gmail.com',
-            'password': 'aklodulalit'
-        }
-    ]
+#     default_admins = [
+#         {
+#             'username': 'vitrag',
+#             'email': 'vitragpatel2408@gmail.com',
+#             'password': 'vklodulalit!'
+#         },
+#         {
+#             'username': 'akshay',
+#             'email': 'vitragharkhani1606@gmail.com',
+#             'password': 'aklodulalit'
+#         }
+#     ]
 
-    print("Ensuring default admin users exist...")
-    for admin_details in default_admins:
-        user = User.query.filter_by(email=admin_details['email']).first()
-        if not user:
-            print(f"Creating default admin user: {admin_details['username']}")
-            new_admin = User(
-                username=admin_details['username'],
-                email=admin_details['email'],
-                is_admin=True
-            )
-            new_admin.set_password(admin_details['password'])
-            db.session.add(new_admin)
-        elif not user.is_admin:
-            user.is_admin = True
-            print(f"User {user.username} exists, promoting to admin.")
+#     print("Ensuring default admin users exist...")
+#     for admin_details in default_admins:
+#         user = User.query.filter_by(email=admin_details['email']).first()
+#         if not user:
+#             print(f"Creating default admin user: {admin_details['username']}")
+#             new_admin = User(
+#                 username=admin_details['username'],
+#                 email=admin_details['email'],
+#                 is_admin=True
+#             )
+#             new_admin.set_password(admin_details['password'])
+#             db.session.add(new_admin)
+#         elif not user.is_admin:
+#             user.is_admin = True
+#             print(f"User {user.username} exists, promoting to admin.")
     
-    db.session.commit()
-    print("Admin user check complete.")
+#     db.session.commit()
+#     print("Admin user check complete.")
 
 
 def create_app():

@@ -345,7 +345,7 @@ def import_emails():
 @login_required
 @admin_required
 def pause_scheduler():
-    """Pauses the scheduler by updating the flag in the database."""
+    """Sets the scheduler status to 'Paused' in the database."""
     status_setting = Settings.query.filter_by(key='scheduler_status').first()
     if not status_setting:
         status_setting = Settings(key='scheduler_status', value='Paused')
@@ -353,36 +353,23 @@ def pause_scheduler():
     else:
         status_setting.value = 'Paused'
     db.session.commit()
-    flash("Email scheduler has been paused.", "info")
+    flash("Email campaign has been paused.", "info")
     return redirect(url_for('routes.dashboard'))
 
-@bp.route('/update-interval', methods=['POST'])
+
+@bp.route('/resume-scheduler', methods=['POST'])
 @login_required
 @admin_required
-def update_interval():
-    """Updates interval and ensures scheduler is set to 'Running'."""
-    form = IntervalUpdateForm()
-    if form.validate_on_submit():
-        new_interval = form.interval.data
-        
-        # Update interval setting
-        interval_setting = Settings.query.filter_by(key='email_interval').first()
-        if not interval_setting:
-            interval_setting = Settings(key='email_interval', value=str(new_interval))
-            db.session.add(interval_setting)
-        else:
-            interval_setting.value = str(new_interval)
-            
-        # Set status to 'Running'
-        status_setting = Settings.query.filter_by(key='scheduler_status').first()
-        if not status_setting:
-            status_setting = Settings(key='scheduler_status', value='Running')
-            db.session.add(status_setting)
-        else:
-            status_setting.value = 'Running'
-        db.session.commit()
-
-        flash(f"Interval updated to {new_interval} minutes. Scheduler will run on its next cycle.", "success")
+def resume_scheduler():
+    """Sets the scheduler status to 'Running' in the database."""
+    status_setting = Settings.query.filter_by(key='scheduler_status').first()
+    if not status_setting:
+        status_setting = Settings(key='scheduler_status', value='Running')
+        db.session.add(status_setting)
+    else:
+        status_setting.value = 'Running'
+    db.session.commit()
+    flash("Email campaign has been resumed.", "success")
     return redirect(url_for('routes.dashboard'))
 
 # ; Your Hosting SMTP (cPanel, etc.)
