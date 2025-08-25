@@ -10,6 +10,22 @@ import user_agents
 # --- Blueprint Setup ---
 tracker_bp = Blueprint('tracker', __name__)
 
+
+#### need to make this change 
+
+# import os
+
+# --- Load GeoIP Database (More Robustly) ---
+# try:
+#     # Build a path to the file relative to this script's location
+#     # This finds the 'shop' folder, goes up one level to the project root,
+#     # and then looks for the file.
+#     db_path = os.path.join(os.path.dirname(__file__), '..', 'GeoLite2-City.mmdb')
+#     geoip_reader = geoip2.database.Reader(db_path)
+# except FileNotFoundError:
+#     print("WARNING: GeoLite2-City.mmdb not found. Geolocation tracking will be disabled.")
+#     geoip_reader = None
+
 # --- Load GeoIP Database ---
 try:
     # Assumes the file is in the root directory of the project
@@ -17,6 +33,7 @@ try:
 except FileNotFoundError:
     print("WARNING: GeoLite2-City.mmdb not found. Geolocation tracking will be disabled.")
     geoip_reader = None
+
 
 # --- Helper Function (for use by the scheduler) ---
 def generate_trackable_link(long_url, recipient_email):
